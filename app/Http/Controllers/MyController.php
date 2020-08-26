@@ -72,4 +72,26 @@ class MyController extends Controller
     {
         return view('hello.helloworld');
     }
+
+    public function getName($name)
+    {
+        return view('name',['t' =>$name]); 
+    }
+
+    // template blade
+    public function blade($name)
+    {
+        $khoahoc = 'php laravel';
+        $toolW = '<b>VSC</b>';
+        $toolM = '<b>Android studio </b>';
+        $student =array('ngo the vinh', 'nguyen van a');
+
+        if($name == 'subject'){
+            return view('pages/subject' ,['kh' =>$khoahoc, 'tool' =>$toolW,'student' => $student]);
+        }elseif($name == 'mobie'){
+            return view('pages/mobie',['kh' =>$khoahoc,'tool' => $toolM ,'student' => $student]);
+
+        }
+    }
+
 }

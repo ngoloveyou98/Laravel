@@ -1,6 +1,8 @@
 <?php
 
+use Facade\FlareClient\View;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,4 +92,80 @@ Route::group(['prefix' =>'MyGroup'], function(){
     //view
     Route::get('myView','MyController@getView');
 
+    Route::get('myname/{name}', 'MyController@getName');
+    //share
+   view()->share('KH', 'Laravel');
+
+   //blade template
+   Route::get('blade', function () {
+       return view('pages/subject');
+   });
+   Route::get('subject', function() {
+       return view('pages/mobie');
+   });
+//    Route::get('subject', function() {
+//     return view('pages/subject');
+// });
+
+    Route::get('TemplateBlade/{name}','MyController@blade');
+
+
+// Database
+    Route::get('database', function () {
+        // Schema::create('users', function ($table) {
+        //     $table->bigIncrements('id');
+        //     $table ->string('HoTen',50);
+        //     $table ->string('DiaChi',50);
+        //     // $table ->string('sdt',11);
+        //     $table ->date('birthday');
+        // });
+        // echo 'create table users successfully';
+
+        Schema::create('sanpham', function ( $table) {
+            $table->increments('id');
+            $table->string('tenSP',30);
+            $table->integer('soluong');
+            
+        });
+        echo 'ok';
+    });
+    Route::get('lienketbang', function () {
+        Schema::create('hoadon', function ( $table) {
+            $table->increments('id');   
+            $table->integer('soluong')->default(0);
+            $table->integer('id_sp')->unsigned();
+            $table->bigInteger('id_KH')->unsigned();
+            $table->foreign('id_SP')->references('id')->on('sanpham');
+            $table->foreign('id_KH')->references('id')->on('users');
+
+        });
+        // Schema::enableForeignKeyConstraints();
+        echo ' tao bang lien ket thanh cong';
+    });
+
+    Route::get('suabang', function () {
+        Schema::table('users', function ($table) {
+            $table->dropColumn('Diachi');
+        });
+        echo 'sửa thành công';
+    });
+    Route::get('themcot', function () {
+        Schema::table('users', function ( $table) {
+            $table->string('Address',30);
+        });
+        echo "Thêm cột thành công";
+    });
+    Route::get('doiten', function () {
+        Schema::rename('users', 'KhachHang');
+    });
+
+
+    //query Builder
+    Route::get('db/get', function () {
+        $data = DB::select('select * from users');
+        foreach($data as $values){
+            echo $values['name'];
+        }
+        echo '<hr>';
+    });
 ?>

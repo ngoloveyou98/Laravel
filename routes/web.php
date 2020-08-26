@@ -4,6 +4,8 @@ use Facade\FlareClient\View;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
+use function GuzzleHttp\Promise\all;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -162,10 +164,158 @@ Route::group(['prefix' =>'MyGroup'], function(){
 
     //query Builder
     Route::get('db/get', function () {
-        $data = DB::select('select * from users');
-        foreach($data as $values){
-            echo $values['name'];
+        // $data = DB::select('select * from users');
+        $data = DB::table('users')->where('id','=',2)->get();
+        
+        // foreach($data as $values){
+            
+        //     // $values = get_object_vars($values);
+        //     echo "name: $values->name"."<br> email: $values->email <br>";
+        //     echo '<hr>'; 
+        // }
+
+        foreach($data as $row){
+            foreach($row as $key => $values){
+                echo "$key : $values <br>";
+            }
+            echo '<hr>';
         }
-        echo '<hr>';
+        
+        // var_dump($data);
     });
+
+    Route::get('db/select', function () {
+        // $data = DB::table('sanpham')->select('tensp')->where('soluong','>=',4)->get();
+        $data = DB::table('sanpham')->select('tensp')->where('tensp','like','%áo%')->get();
+
+        foreach($data as $row){
+            foreach($row as $key => $values){
+                echo "$key : $values <br>";
+            }
+            echo '<hr>';
+        }
+    });
+
+    //raw
+    Route::get('db/raw', function () {
+        // $data = DB::table('sanpham')->select('tensp')->where('soluong','>=',4)->get();
+        $data = DB::table('sanpham')->select(DB::raw('id,tensp as TenSanpham,soluong '))->get();
+
+        foreach($data as $row){
+            foreach($row as $key => $values){
+                echo "$key : $values <br>";
+            }
+            echo '<hr>';
+        }
+    });
+
+    //orderby
+    Route::get('db/orderby', function () {
+        // $data = DB::table('sanpham')->select('tensp')->where('soluong','>=',4)->get();
+        $data = DB::table('sanpham')->select(DB::raw('id,tensp as TenSanpham,soluong '))->orderby('tensp','asc')->get();
+        //desc
+        foreach($data as $row){
+            foreach($row as $key => $values){
+                echo "$key : $values <br>";
+            }
+            echo '<hr>';
+        }
+    });
+
+    //groupBy
+    Route::get('db/groupby', function () {
+        // $data = DB::table('sanpham')->select('tensp')->where('soluong','>=',4)->get();
+        $data = DB::table('sanpham') 
+                ->groupBy('id')
+                ->having('id','>',2)
+                ->skip(1)->take(3)//bo qua 1 va lay 3 phan tu tiep theo
+                ->get();
+        //desc
+        foreach($data as $row){
+            foreach($row as $key => $values){
+                echo "$key : $values <br>";
+            }
+            echo '<hr>';
+        }
+    });
+    //max
+    Route::get('db/max', function () {
+        // $data = DB::table('sanpham')->select('tensp')->where('soluong','>=',4)->get();
+        $data = DB::table('sanpham')->select('tensp')
+                ->max('soluong');
+                // ->get();
+        echo $data;
+        // foreach($data as $row){
+        //     foreach($row as $key => $values){
+        //         echo "$key : $values <br>";
+        //     }
+        //     echo '<hr>';
+        // }
+
+        // foreach($data as $dt){
+        //     echo $dt->tensp;
+        // }
+        // var_dump($data);
+    });
+
+    //update
+
+    Route::get('db/update', function () {
+        DB::table('nhanvien')->where('HoTen','like','%nở%')->update(['HoTen'=>'Thị Nở']);
+        echo 'đã update';
+    });
+
+
+    //Model
+    Route::group(['prefix' => 'model'], function () {
+        Route::get('save', function () {
+            $user = new App\User();
+            $user->name = 'Cậu vàng';
+            $user->email = 'cauvang@gmail.com';
+            $user->password = bcrypt('123456');
+            $user->save();
+            echo 'save successfully';
+        });
+        Route::get('query', 'MyController@model');
+        // Route::get('query', function () {
+        //     $user = App\User::find(1);
+        //     return $user->name;
+        // });
+
+
+        Route::group(['prefix' => 'sanpham'], function () {
+            Route::get('save', function () {
+                $sanpham = new App\SanPham();
+                $sanpham ->tensp = 'Bomber 1';
+                $sanpham ->soluong = 1;
+                $sanpham->save();
+    
+                echo 'thêm thành công';
+            });
+            Route::get('all', 'SanPhamController@getAll');
+
+            //chức năng tìm kiếm
+            Route::get('find', 'SanPhamController@getForm');
+            Route::post('postfind', ['as'=>'postfind','uses' => 'SanPhamController@postfind']);
+
+            Route::get('lienket','SanPhamController@lkHoaDon');
+        });
+    });
+    
+    //MiddleWare
+    Route::get('diem', function () {
+        echo "Điểm đạt";
+    })->name('diem')
+    ->middleware('codiem');
+    Route::get('loi', function () {
+        echo 'bạn chưa có điểm';
+    })->name('loi');
+    Route::get('kodat', function () {
+        echo 'TRƯỢT';
+    })->name('kodat');
+
+    Route::get('nhapdiem', function () {
+        return view('pages.nhapdiem');
+    });
+    
 ?>

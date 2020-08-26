@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -93,5 +94,10 @@ class MyController extends Controller
 
         }
     }
-
+    //model
+    public function model()
+    {
+            $user = User::find(1);
+            return $user->name;
+    }
 }

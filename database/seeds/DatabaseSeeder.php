@@ -22,5 +22,8 @@ class userSeeder extends Seeder{
         //     'password'=>bcrypt('matkhau')
         // ]);
         // DB::insert('insert into users (name, email,password) values (?, ?,?)', ['vinhngo', 'vinh@gmail.com',bcrypt(('123456'))]);
+        
+        // DB::insert('insert into nhanvien (hoten, diachi,salary) values (?, ?,?)', ['Nguyễn Chí Phèo','Hà Nội',500000]);
+        
     }
 }

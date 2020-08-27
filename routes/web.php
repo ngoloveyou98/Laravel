@@ -3,7 +3,7 @@
 use Facade\FlareClient\View;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 use function GuzzleHttp\Promise\all;
 
 /*
@@ -317,5 +317,57 @@ Route::group(['prefix' =>'MyGroup'], function(){
     Route::get('nhapdiem', function () {
         return view('pages.nhapdiem');
     });
+
+
+    // soft delete 
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('softdeletes/{id}', function ($id) {
+            App\User::where('id',$id)->delete();
+            echo "đã xóa id: $id";
+        });
+
+        Route::get('all', function () {
+            $user = App\User::all();
+            // $user = DB::table('users')->get(); //  soft deletes không sử dụng đc với query builder
+            foreach($user as $us){
+                echo "name: $us->name <br> email: $us->email <hr>";
+                
+            }
+        });
+    });
     
+
+    //Auth
+
+    Route::get('dangnhap', 'AuthController@getViewLogin');
+    Route::post('login', ['as'=>'login','uses'=>'AuthController@login']);
+    //logout
+    Route::get('logout','AuthController@logout') ;
+    Route::get('thu', function(){
+        return view('successfully');
+    });
+
+
+    //Session
+    Route::group(['middleware' => ['web']], function () {
+        Route::get('Session', function () {
+            session()->put('khoahoc','laravel');
+            echo "đặt session thành công <br>";
+            session()->flash('mess','Hello');
+            // Session::forget('khoahoc');
+            // Session::flush();
+            // echo Session::get('khoahoc');
+
+            if(session()->has('khoahoc')){
+                echo 'đã có khóa học';
+            }else echo 'chưa có ';
+        });
+        Route::get('Session/flash', function(){
+            echo session()->get('mess');
+        });
+    });
+
+    // Phân trang
+    Route::get('tin', 'TinController@index');
+
 ?>

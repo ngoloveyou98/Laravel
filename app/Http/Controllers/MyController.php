@@ -100,4 +100,10 @@ class MyController extends Controller
             $user = User::find(1);
             return $user->name;
     }
+
+    //session
+    public function getSession()
+    {
+        
+    }
 }

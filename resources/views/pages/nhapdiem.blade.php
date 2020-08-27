@@ -6,7 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="{{route("diem")}}">
+    <form action="" method="get">
+    <!-- {{route("diem")}} -->
         {{ csrf_field() }}
         <input type="text" name="diem" value="">
         <input type="submit"  value="submit">
